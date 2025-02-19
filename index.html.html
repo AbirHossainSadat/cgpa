@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator</title>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function () {
+            const gradeScale = {
+                "A+": 4.00, "A": 3.75, "A-": 3.50,
+                "B+": 3.25, "B": 3.00, "B-": 2.75,
+                "C+": 2.50, "C": 2.25, "D": 2.00, "F": 0.00
+            };
+
+            const semestersContainer = document.getElementById("semesters");
+            const cgpaResult = document.getElementById("cgpa-result");
+            const semesterCountInput = document.getElementById("semester-count");
+            const addSemesterBtn = document.getElementById("add-semester");
+            const calculateCgpaBtn = document.getElementById("calculate-cgpa");
+
+            function createSemesterFields(numSemesters) {
+                semestersContainer.innerHTML = "";
+                for (let i = 0; i < numSemesters; i++) {
+                    const semesterDiv = document.createElement("div");
+                    semesterDiv.classList.add("semester");
+                    semesterDiv.innerHTML = `
+                        <h3>Semester ${i + 1}</h3>
+                        <div class="subjects"></div>
+                        <button class="add-subject">Add Subject</button>
+                        <button class="remove-subject">Remove Subject</button>
+                    `;
+                    createSubjectFields(semesterDiv.querySelector(".subjects"));
+                    semestersContainer.appendChild(semesterDiv);
+
+                    const addSubjectBtn = semesterDiv.querySelector(".add-subject");
+                    const removeSubjectBtn = semesterDiv.querySelector(".remove-subject");
+
+                    addSubjectBtn.addEventListener("click", function () {
+                        createSubjectFields(semesterDiv.querySelector(".subjects"));
+                    });
+
+                    removeSubjectBtn.addEventListener("click", function () {
+                        const subjects = semesterDiv.querySelectorAll(".subject");
+                        if (subjects.length > 1) {
+                            subjects[subjects.length - 1].remove();
+                        }
+                    });
+                }
+            }
+
+            function createSubjectFields(container) {
+                const div = document.createElement("div");
+                div.classList.add("subject");
+                div.innerHTML = `
+                    <select class="grade">
+                        ${Object.keys(gradeScale).map(g => `<option value="${g}">${g}</option>`).join('')}
+                    </select>
+                    <input type="number" placeholder="Credit Hours" class="credit">
+                `;
+                container.appendChild(div);
+            }
+
+            addSemesterBtn.addEventListener("click", function () {
+                const numSemesters = parseInt(semesterCountInput.value);
+                if (isNaN(numSemesters) || numSemesters <= 0) {
+                    cgpaResult.textContent = "Please enter a valid number of semesters";
+                    return;
+                }
+                createSemesterFields(numSemesters);
+            });
+
+            calculateCgpaBtn.addEventListener("click", function () {
+                let totalGradePoints = 0, totalCredits = 0;
+                let semesterCGPAs = [];
+                document.querySelectorAll(".semester").forEach(semester => {
+                    let semesterTotalPoints = 0, semesterTotalCredits = 0;
+                    semester.querySelectorAll(".subject").forEach(subject => {
+                        const grade = subject.querySelector(".grade").value;
+                        const credit = parseFloat(subject.querySelector(".credit").value);
+                        if (gradeScale[grade] !== undefined && !isNaN(credit)) {
+                            semesterTotalPoints += gradeScale[grade] * credit;
+                            semesterTotalCredits += credit;
+                        }
+                    });
+                    let semesterCGPA = semesterTotalCredits > 0 ? (semesterTotalPoints / semesterTotalCredits) : 0;
+                    semesterCGPAs.push(semesterCGPA);
+                    totalGradePoints += semesterTotalPoints;
+                    totalCredits += semesterTotalCredits;
+                });
+                let overallCGPA = totalCredits > 0 ? (totalGradePoints / totalCredits) : 0;
+
+                cgpaResult.innerHTML = `<h2>Overall CGPA: ${overallCGPA.toFixed(2)}</h2>`;
+                semesterCGPAs.forEach((cgpa, index) => {
+                    const semesterResult = document.createElement('p');
+                    semesterResult.textContent = `Semester ${index + 1} CGPA: ${cgpa.toFixed(2)}`;
+                    cgpaResult.appendChild(semesterResult);
+                });
+            });
+
+            semesterCountInput.value = 1;
+            createSemesterFields(1);
+        });
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f4f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .titleBox {
+            width: 100%;
+            background-color: #343a40;
+            color: #fff;
+            font-size: 60px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 50px;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            
+        }
+
+        .titleHeader2 {
+            color: rgb(255, 255, 255);
+            display: inline;
+            background-color: #73ff5b;
+            padding: 15px;
+            border-radius: 20px 20px;
+        }
+        @keyframes colorChange {
+            0% { color: #73ff5b; }   /* Red */
+            25% { color: #15162a; }  /* Orange */
+            50% { color: #15162a; }  /* Green */
+            75% { color: #15162a; }  /* Blue */
+            100% { color: #73ff5b; }  /* Back to Red */
+        }
+
+        .titleHeader2 {
+            display: inline-block;
+            font-size: 60px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 20px;
+            animation: colorChange 10s infinite linear; /* Apply animation */
+        }
+
+        
+        
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #4e73df;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 22px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .semester {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9fafc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .subjects {
+            margin: 15px 0;
+        }
+
+        .subject {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .subject:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        select, input {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4e73df;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2e59d9;
+        }
+
+        .add-subject {
+            background-color: #28a745;
+        }
+
+        .remove-subject {
+            background-color: #dc3545;
+        }
+
+        .add-subject:hover {
+            background-color: #218838;
+        }
+
+        .remove-subject:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="titleBox">
+        <div id="titleHeader">Tool </div> <div class="titleHeader2"> xD</div>
+    </div>
+    <div class="container">
+        <h1>CGPA Calculator</h1>
+        <input type="number" id="semester-count" placeholder="Enter number of semesters">
+        <button id="add-semester">Add Semesters</button>
+        <div id="semesters"></div>
+        <button id="calculate-cgpa">Calculate CGPA</button>
+        <div id="cgpa-result"></div>
+    </div>
+</body>
+</html>
