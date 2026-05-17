@@ -4,103 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CGPA Calculator</title>
-    <script defer>
-        document.addEventListener("DOMContentLoaded", function () {
-            const gradeScale = {
-                "A+": 4.00, "A": 3.75, "A-": 3.50,
-                "B+": 3.25, "B": 3.00, "B-": 2.75,
-                "C+": 2.50, "C": 2.25, "D": 2.00, "F": 0.00
-            };
-
-            const semestersContainer = document.getElementById("semesters");
-            const cgpaResult = document.getElementById("cgpa-result");
-            const semesterCountInput = document.getElementById("semester-count");
-            const addSemesterBtn = document.getElementById("add-semester");
-            const calculateCgpaBtn = document.getElementById("calculate-cgpa");
-
-            function createSemesterFields(numSemesters) {
-                semestersContainer.innerHTML = "";
-                for (let i = 0; i < numSemesters; i++) {
-                    const semesterDiv = document.createElement("div");
-                    semesterDiv.classList.add("semester");
-                    semesterDiv.innerHTML = `
-                        <h3>Semester ${i + 1}</h3>
-                        <div class="subjects"></div>
-                        <button class="add-subject">Add Subject</button>
-                        <button class="remove-subject">Remove Subject</button>
-                    `;
-                    createSubjectFields(semesterDiv.querySelector(".subjects"));
-                    semestersContainer.appendChild(semesterDiv);
-
-                    const addSubjectBtn = semesterDiv.querySelector(".add-subject");
-                    const removeSubjectBtn = semesterDiv.querySelector(".remove-subject");
-
-                    addSubjectBtn.addEventListener("click", function () {
-                        createSubjectFields(semesterDiv.querySelector(".subjects"));
-                    });
-
-                    removeSubjectBtn.addEventListener("click", function () {
-                        const subjects = semesterDiv.querySelectorAll(".subject");
-                        if (subjects.length > 1) {
-                            subjects[subjects.length - 1].remove();
-                        }
-                    });
-                }
-            }
-
-            function createSubjectFields(container) {
-                const div = document.createElement("div");
-                div.classList.add("subject");
-                div.innerHTML = `
-                    <select class="grade">
-                        ${Object.keys(gradeScale).map(g => `<option value="${g}">${g}</option>`).join('')}
-                    </select>
-                    <input type="number" placeholder="Credit Hours" class="credit">
-                `;
-                container.appendChild(div);
-            }
-
-            addSemesterBtn.addEventListener("click", function () {
-                const numSemesters = parseInt(semesterCountInput.value);
-                if (isNaN(numSemesters) || numSemesters <= 0) {
-                    cgpaResult.textContent = "Please enter a valid number of semesters";
-                    return;
-                }
-                createSemesterFields(numSemesters);
-            });
-
-            calculateCgpaBtn.addEventListener("click", function () {
-                let totalGradePoints = 0, totalCredits = 0;
-                let semesterCGPAs = [];
-                document.querySelectorAll(".semester").forEach(semester => {
-                    let semesterTotalPoints = 0, semesterTotalCredits = 0;
-                    semester.querySelectorAll(".subject").forEach(subject => {
-                        const grade = subject.querySelector(".grade").value;
-                        const credit = parseFloat(subject.querySelector(".credit").value);
-                        if (gradeScale[grade] !== undefined && !isNaN(credit)) {
-                            semesterTotalPoints += gradeScale[grade] * credit;
-                            semesterTotalCredits += credit;
-                        }
-                    });
-                    let semesterCGPA = semesterTotalCredits > 0 ? (semesterTotalPoints / semesterTotalCredits) : 0;
-                    semesterCGPAs.push(semesterCGPA);
-                    totalGradePoints += semesterTotalPoints;
-                    totalCredits += semesterTotalCredits;
-                });
-                let overallCGPA = totalCredits > 0 ? (totalGradePoints / totalCredits) : 0;
-
-                cgpaResult.innerHTML = `<h2>Overall CGPA: ${overallCGPA.toFixed(2)}</h2>`;
-                semesterCGPAs.forEach((cgpa, index) => {
-                    const semesterResult = document.createElement('p');
-                    semesterResult.textContent = `Semester ${index + 1} CGPA: ${cgpa.toFixed(2)}`;
-                    cgpaResult.appendChild(semesterResult);
-                });
-            });
-
-            semesterCountInput.value = 1;
-            createSemesterFields(1);
-        });
-    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -115,7 +18,6 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
 
         .titleBox {
@@ -126,49 +28,39 @@
             font-weight: bold;
             text-align: center;
             padding: 20px 0;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            display: flex;
-            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-            
-        }
-
-        .titleHeader2 {
-            color: rgb(255, 255, 255);
-            display: inline;
-            background-color: #73ff5b;
-            padding: 15px;
-            border-radius: 20px 20px;
-        }
-        @keyframes colorChange {
-            0% { color: #73ff5b; }   /* Red */
-            25% { color: #15162a; }  /* Orange */
-            50% { color: #15162a; }  /* Green */
-            75% { color: #15162a; }  /* Blue */
-            100% { color: #73ff5b; }  /* Back to Red */
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
         }
 
         .titleHeader2 {
             display: inline-block;
-            font-size: 60px;
-            font-weight: bold;
+            color: #73ff5b;
+            background-color: #73ff5b;
             padding: 15px;
-            border-radius: 20px;
-            animation: colorChange 10s infinite linear; /* Apply animation */
+            border-radius: 20px 20px;
+            animation: colorChange 10s infinite linear;
         }
 
-        
-        
+        @keyframes colorChange {
+            0% { color: #73ff5b; }
+            25% { color: #15162a; }
+            50% { color: #15162a; }
+            75% { color: #15162a; }
+            100% { color: #73ff5b; }
+        }
 
         .container {
-            max-width: 600px;
-            width: 90%;
+            max-width: 700px;
+            width: 95%;
             background-color: #fff;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
+            margin-bottom: 30px;
         }
 
         h1 {
@@ -190,12 +82,85 @@
             font-weight: bold;
         }
 
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .top-actions button {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #4e73df;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        .top-actions button:hover {
+            background-color: #2e59d9;
+        }
+        .top-actions .save-btn {
+            background-color: #28a745;
+        }
+        .top-actions .save-btn:hover {
+            background-color: #218838;
+        }
+        .top-actions .load-btn {
+            background-color: #6c757d;
+        }
+        .top-actions .load-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .semester-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .semester-controls input {
+            width: 80px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
         .semester {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding: 20px;
             border-radius: 10px;
             background-color: #f9fafc;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .semester-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .semester-header button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .semester-header button:hover {
+            background-color: #c82333;
         }
 
         .subjects {
@@ -227,14 +192,13 @@
         }
 
         button {
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 10px 16px;
+            font-size: 14px;
             color: #fff;
             background-color: #4e73df;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
             transition: background-color 0.3s ease;
         }
 
@@ -244,32 +208,306 @@
 
         .add-subject {
             background-color: #28a745;
-        }
-
-        .remove-subject {
-            background-color: #dc3545;
+            margin-right: 5px;
         }
 
         .add-subject:hover {
             background-color: #218838;
         }
 
+        .remove-subject {
+            background-color: #dc3545;
+        }
+
         .remove-subject:hover {
             background-color: #c82333;
+        }
+
+        #cgpa-result {
+            margin-top: 25px;
+            background: #eef2ff;
+            padding: 20px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="titleBox">
-        <div id="titleHeader">Tool </div> <div class="titleHeader2"> xD</div>
+        <div id="titleHeader">Tool </div>
+        <div class="titleHeader2"> xD</div>
     </div>
+
     <div class="container">
         <h1>CGPA Calculator</h1>
-        <input type="number" id="semester-count" placeholder="Enter number of semesters">
-        <button id="add-semester">Add Semesters</button>
+
+        <!-- Save / Load buttons -->
+        <div class="top-actions">
+            <button class="save-btn" id="save-btn">💾 Save to .txt</button>
+            <button class="load-btn" id="load-btn">📂 Load .txt</button>
+            <input type="file" id="load-file" accept=".txt" style="display: none;">
+        </div>
+
+        <!-- Semester controls: bulk add + single add -->
+        <div class="semester-controls">
+            <input type="number" id="semester-count" placeholder="Qty" min="1" value="1">
+            <button id="add-semesters">Add Semesters</button>
+            <button id="add-single-semester" style="background-color:#17a2b8;">➕ Add 1 Semester</button>
+        </div>
+
+        <!-- All semesters will be rendered here -->
         <div id="semesters"></div>
-        <button id="calculate-cgpa">Calculate CGPA</button>
+
+        <button id="calculate-cgpa" style="margin-top:10px;">📊 Calculate CGPA</button>
         <div id="cgpa-result"></div>
     </div>
+
+    <script>
+        (function() {
+            const gradeScale = {
+                "A+": 4.00, "A": 3.75, "A-": 3.50,
+                "B+": 3.25, "B": 3.00, "B-": 2.75,
+                "C+": 2.50, "C": 2.25, "D": 2.00, "F": 0.00
+            };
+
+            // Main state: array of semester objects { subjects: [{grade, credit}] }
+            let semestersData = [];
+
+            // DOM elements
+            const semestersContainer = document.getElementById("semesters");
+            const cgpaResult = document.getElementById("cgpa-result");
+            const semesterCountInput = document.getElementById("semester-count");
+            const addSemestersBtn = document.getElementById("add-semesters");
+            const addSingleSemesterBtn = document.getElementById("add-single-semester");
+            const calculateBtn = document.getElementById("calculate-cgpa");
+            const saveBtn = document.getElementById("save-btn");
+            const loadBtn = document.getElementById("load-btn");
+            const loadFileInput = document.getElementById("load-file");
+
+            // ---------- Rendering ----------
+            function renderAllSemesters() {
+                semestersContainer.innerHTML = "";
+                if (semestersData.length === 0) {
+                    semestersContainer.innerHTML = "<p style='color:#888;'>No semesters added yet. Use the buttons above to start.</p>";
+                    return;
+                }
+
+                semestersData.forEach((sem, index) => {
+                    const semDiv = document.createElement("div");
+                    semDiv.classList.add("semester");
+
+                    // Header with remove button
+                    const headerDiv = document.createElement("div");
+                    headerDiv.classList.add("semester-header");
+                    headerDiv.innerHTML = `<h3>Semester ${index + 1}</h3>
+                        <button class="remove-semester" data-index="${index}">🗑️ Remove</button>`;
+
+                    // Subjects container
+                    const subjectsDiv = document.createElement("div");
+                    subjectsDiv.classList.add("subjects");
+                    // Render each subject
+                    sem.subjects.forEach((sub, subIndex) => {
+                        const subDiv = createSubjectElement(sub.grade, sub.credit, index, subIndex);
+                        subjectsDiv.appendChild(subDiv);
+                    });
+
+                    // Add / Remove subject buttons
+                    const btnAddSubject = document.createElement("button");
+                    btnAddSubject.classList.add("add-subject");
+                    btnAddSubject.textContent = "+ Add Subject";
+                    btnAddSubject.dataset.semIndex = index;
+
+                    const btnRemoveSubject = document.createElement("button");
+                    btnRemoveSubject.classList.add("remove-subject");
+                    btnRemoveSubject.textContent = "- Remove Subject";
+                    btnRemoveSubject.dataset.semIndex = index;
+
+                    semDiv.appendChild(headerDiv);
+                    semDiv.appendChild(subjectsDiv);
+                    semDiv.appendChild(btnAddSubject);
+                    semDiv.appendChild(btnRemoveSubject);
+                    semestersContainer.appendChild(semDiv);
+                });
+
+                // Attach event listeners (using event delegation for dynamic elements)
+                attachEventListeners();
+            }
+
+            function createSubjectElement(grade, credit, semIndex, subIndex) {
+                const div = document.createElement("div");
+                div.classList.add("subject");
+                div.innerHTML = `
+                    <select class="grade" data-sem="${semIndex}" data-sub="${subIndex}">
+                        ${Object.keys(gradeScale).map(g => `<option value="${g}" ${g === grade ? 'selected' : ''}>${g}</option>`).join('')}
+                    </select>
+                    <input type="number" class="credit" placeholder="Credit Hours" value="${credit}" step="0.5" min="0.5" data-sem="${semIndex}" data-sub="${subIndex}">
+                `;
+                return div;
+            }
+
+            function attachEventListeners() {
+                // Remove semester buttons
+                document.querySelectorAll(".remove-semester").forEach(btn => {
+                    btn.addEventListener("click", function(e) {
+                        const index = parseInt(this.dataset.index);
+                        semestersData.splice(index, 1);
+                        renderAllSemesters();
+                    });
+                });
+
+                // Add subject buttons
+                document.querySelectorAll(".add-subject").forEach(btn => {
+                    btn.addEventListener("click", function(e) {
+                        const semIndex = parseInt(this.dataset.semIndex);
+                        semestersData[semIndex].subjects.push({ grade: "A+", credit: 3 });
+                        renderAllSemesters();
+                    });
+                });
+
+                // Remove subject buttons (remove last subject of that semester)
+                document.querySelectorAll(".remove-subject").forEach(btn => {
+                    btn.addEventListener("click", function(e) {
+                        const semIndex = parseInt(this.dataset.semIndex);
+                        if (semestersData[semIndex].subjects.length > 1) {
+                            semestersData[semIndex].subjects.pop();
+                            renderAllSemesters();
+                        } else {
+                            alert("Each semester must have at least one subject.");
+                        }
+                    });
+                });
+
+                // Grade and credit changes (update state directly)
+                document.querySelectorAll(".grade, .credit").forEach(el => {
+                    el.addEventListener("change", function() {
+                        const semIndex = parseInt(this.dataset.sem);
+                        const subIndex = parseInt(this.dataset.sub);
+                        if (this.classList.contains("grade")) {
+                            semestersData[semIndex].subjects[subIndex].grade = this.value;
+                        } else if (this.classList.contains("credit")) {
+                            const val = parseFloat(this.value);
+                            semestersData[semIndex].subjects[subIndex].credit = isNaN(val) ? 0 : val;
+                        }
+                        // No need to re-render; state updated in place.
+                    });
+                });
+            }
+
+            // ---------- Semester management ----------
+            function addSemesters(count) {
+                for (let i = 0; i < count; i++) {
+                    semestersData.push({
+                        subjects: [{ grade: "A+", credit: 3 }]  // default one subject
+                    });
+                }
+                renderAllSemesters();
+                // Do NOT reset the input value; keep whatever user entered.
+            }
+
+            // ---------- Load / Save ----------
+            function saveToFile() {
+                if (semestersData.length === 0) {
+                    alert("Nothing to save. Add some semesters first.");
+                    return;
+                }
+                const json = JSON.stringify(semestersData, null, 2);
+                const blob = new Blob([json], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cgpa_backup_${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function loadFromFile(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!Array.isArray(data)) throw new Error("Invalid format");
+                        // Basic validation: each item must have subjects array
+                        if (data.some(sem => !Array.isArray(sem.subjects))) throw new Error("Invalid structure");
+                        semestersData = data.map(sem => ({
+                            subjects: sem.subjects.map(sub => ({
+                                grade: gradeScale[sub.grade] ? sub.grade : "A+",
+                                credit: parseFloat(sub.credit) || 3
+                            }))
+                        }));
+                        renderAllSemesters();
+                        cgpaResult.innerHTML = ""; // clear previous result
+                    } catch (err) {
+                        alert("Failed to load file. Make sure it's a valid CGPA .txt file.");
+                    }
+                };
+                reader.readAsText(file);
+                loadFileInput.value = ""; // allow re-uploading same file
+            }
+
+            // ---------- CGPA Calculation ----------
+            function calculateCGPA() {
+                let totalGradePoints = 0, totalCredits = 0;
+                let semesterCGPAs = [];
+
+                semestersData.forEach(sem => {
+                    let semPoints = 0, semCredits = 0;
+                    sem.subjects.forEach(sub => {
+                        const gp = gradeScale[sub.grade];
+                        const cr = parseFloat(sub.credit);
+                        if (gp !== undefined && !isNaN(cr) && cr > 0) {
+                            semPoints += gp * cr;
+                            semCredits += cr;
+                        }
+                    });
+                    const semCG = semCredits > 0 ? (semPoints / semCredits) : 0;
+                    semesterCGPAs.push(semCG);
+                    totalGradePoints += semPoints;
+                    totalCredits += semCredits;
+                });
+
+                const overallCG = totalCredits > 0 ? (totalGradePoints / totalCredits) : 0;
+
+                let html = `<h2>Overall CGPA: ${overallCG.toFixed(2)}</h2>`;
+                semesterCGPAs.forEach((cgpa, idx) => {
+                    html += `<p><strong>Semester ${idx + 1}:</strong> ${cgpa.toFixed(2)}</p>`;
+                });
+                cgpaResult.innerHTML = html;
+            }
+
+            // ---------- Event binding ----------
+            addSemestersBtn.addEventListener("click", () => {
+                const count = parseInt(semesterCountInput.value);
+                if (isNaN(count) || count < 1) {
+                    alert("Please enter a valid number (1 or more).");
+                    return;
+                }
+                addSemesters(count);
+            });
+
+            addSingleSemesterBtn.addEventListener("click", () => {
+                addSemesters(1);
+            });
+
+            calculateBtn.addEventListener("click", calculateCGPA);
+
+            saveBtn.addEventListener("click", saveToFile);
+
+            loadBtn.addEventListener("click", () => {
+                loadFileInput.click();
+            });
+
+            loadFileInput.addEventListener("change", (e) => {
+                if (e.target.files.length > 0) {
+                    loadFromFile(e.target.files[0]);
+                }
+            });
+
+            // ---------- Initialisation ----------
+            // Start with 1 semester
+            semestersData = [{ subjects: [{ grade: "A+", credit: 3 }] }];
+            renderAllSemesters();
+        })();
+    </script>
 </body>
 </html>
